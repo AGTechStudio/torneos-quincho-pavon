@@ -1,0 +1,5 @@
+# Archivos que no hace falta subir a GitHub
+.DS_Store
+Thumbs.db
+.vscode/
+*.log

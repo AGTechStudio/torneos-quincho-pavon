@@ -1,0 +1,33 @@
+rules_version = '2';
+
+// Reglas simples para uso entre amigos en el quincho: cualquiera que tenga
+// el link puede leer y escribir los torneos de la noche. No hay datos
+// sensibles (solo nombres y resultados), así que se prioriza que sea
+// simple y funcione ya.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /torneos/{torneoId} {
+      allow read, write: if true;
+
+      match /jugadores/{jugadorId} {
+        allow read, write: if true;
+      }
+      match /equipos/{equipoId} {
+        allow read, write: if true;
+      }
+      match /partidos/{partidoId} {
+        allow read, write: if true;
+      }
+    }
+
+    // Necesaria además de la de arriba: la de arriba solo cubre leer los
+    // partidos DE UN torneo puntual (torneos/{id}/partidos). Esta de acá,
+    // con el comodín {path=**}, es la que habilita las consultas "de todos
+    // los torneos a la vez" (collection group) que usa el ranking de Mes
+    // y Año. Sin esta regla, esas consultas tiran "Missing or insufficient
+    // permissions" aunque la de arriba esté bien.
+    match /{path=**}/partidos/{partidoId} {
+      allow read: if true;
+    }
+  }
+}
